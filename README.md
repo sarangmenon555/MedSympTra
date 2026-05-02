@@ -20,9 +20,9 @@ MedSympTra walks users through **7 simple questions** about their symptoms and r
 
 | Result | Meaning |
 |---|---|
-| 🟢 Home Care Appropriate | Rest at home, stay hydrated, monitor symptoms |
-| 🟡 Medical Attention Needed | Visit a clinic or doctor within 12–24 hours |
-| 🔴 Emergency — Act Now | Go to the emergency room or call an ambulance immediately |
+| Home Care Appropriate | Rest at home, stay hydrated, monitor symptoms |
+| Medical Attention Needed | Visit a clinic or doctor within 12–24 hours |
+| Emergency — Act Now | Go to the emergency room or call an ambulance immediately |
 
 Each result includes specific action steps, warning signs to watch for, and relevant helpline numbers.
 
@@ -35,8 +35,6 @@ Each result includes specific action steps, warning signs to watch for, and rele
 - **Health Resources page** — 12 India emergency helplines including ambulance (102/108), mental health, women's helpline, TB, poison control, blood bank, and organ donation
 - **ABHA explainer** — information on India's national digital health identity (Ayushman Bharat Health Account)
 - **WHO & SDG 3 section** — context on the global health mission this tool supports
-- **Large Text mode** — one-tap accessibility toggle for elderly users and those with low vision, with preference saved across sessions
-- **Works offline** — no internet required after the first load
 - **100% private** — no data is stored, no login required, no tracking
 
 ---
@@ -56,10 +54,8 @@ By helping people make informed decisions about when to seek care, MedSympTra re
 
 | Layer | Technology |
 |---|---|
-| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Frontend | HTML5, CSS3 |
 | Fonts | DM Sans, DM Serif Display (Google Fonts) |
-| Offline support | Service Worker (Cache API) |
-| Storage | localStorage (accessibility preference only) |
 | Backend | None — fully client-side |
 | Dependencies | Zero external libraries |
 
@@ -69,23 +65,10 @@ By helping people make informed decisions about when to seek care, MedSympTra re
 
 MedSympTra is a single HTML file with no build step required.
 
-**Option 1 — Open directly:**
+**Open directly:**
 ```
 Open index.html in any modern browser
 ```
-
-**Option 2 — Serve locally (recommended for PWA features):**
-```bash
-# Using Python
-python -m http.server 8000
-
-# Using Node.js
-npx serve .
-```
-Then visit `http://localhost:8000`
-
-**Option 3 — Deploy:**
-Upload to GitHub Pages, Netlify, or Vercel. No configuration needed.
 
 ---
 
@@ -93,10 +76,8 @@ Upload to GitHub Pages, Netlify, or Vercel. No configuration needed.
 
 ```
 medsymptra/
-├── index.html        # Main application (self-contained)
-├── manifest.json     # PWA manifest for installability
-├── sw.js             # Service worker for offline support
-└── README.md         # This file
+├── index.html     
+└── README.md        
 ```
 
 ---
@@ -123,4 +104,4 @@ Organized by: Global NGO Executive Committee (GNEC)
 
 ---
 
-*MedSympTra — Free. Private. Works offline. Built for communities that need it most.*
+*MedSympTra — Free. Private. Built for communities that need it most.*
