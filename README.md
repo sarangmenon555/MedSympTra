@@ -54,7 +54,7 @@ By helping people make informed decisions about when to seek care, MedSympTra re
 
 | Layer | Technology |
 |---|---|
-| Frontend | HTML5, CSS3 |
+| Frontend | HTML5, CSS3, JavaScript |
 | Fonts | DM Sans, DM Serif Display (Google Fonts) |
 | Backend | None — fully client-side |
 | Dependencies | Zero external libraries |
