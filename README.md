@@ -82,14 +82,6 @@ medsymptra/
 
 ---
 
-## Screenshots
-
-| Home Screen | Symptom Checker | Result Screen |
-|---|---|---|
-| Clean landing page with how-it-works and stats | 7-step guided question flow with progress bar | Color-coded result with action steps and warning signs |
-
----
-
 ## Disclaimer
 
 MedSympTra provides **guidance only** — it is not a medical diagnosis tool and does not replace the advice of a qualified healthcare professional. In a life-threatening emergency, always call 102 or 108 immediately.
