@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedSympTra — Know When to Seek Care</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2B5FA6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MedSympTra">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F5F2ED;--surface:#FDFCFB;--text:#1A1714;--text-muted:#6B6560;
+    --border:#E0DBD4;--green:#1E6B4A;--green-light:#EAF4EE;--green-mid:#2E9E6E;
+    --amber:#8B5E0A;--amber-light:#FEF5E4;--red:#991B1B;--red-light:#FEF2F2;
+    --accent:#2B5FA6;--accent-light:#EEF3FB;--radius:16px;--radius-sm:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+  .logo{display:flex;align-items:center;gap:10px;}
+  .logo-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+  .logo-icon svg{width:18px;height:18px;}
+  .logo-text{font-family:'DM Serif Display',serif;font-size:20px;letter-spacing:-0.3px;}
+  .logo-badge{font-size:11px;font-weight:500;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:20px;}
+  .header-right{display:flex;align-items:center;gap:12px;}
+  .sdg-tag{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+  .sdg-dot{width:8px;height:8px;background:var(--green-mid);border-radius:50%;}
+  main{max-width:760px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+  .screen{display:none;animation:fadeUp 0.35s ease both;}
+  .screen.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .hero{text-align:center;padding:3rem 0 2rem;}
+  .hero-eyebrow{font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;}
+  .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,3.2rem);line-height:1.15;letter-spacing:-0.5px;margin-bottom:1.1rem;}
+  .hero h1 em{font-style:italic;color:var(--accent);}
+  .hero p{font-size:17px;color:var(--text-muted);max-width:520px;margin:0 auto 2rem;font-weight:300;}
+  .disclaimer-box{background:var(--amber-light);border:1px solid #F0D99A;border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:var(--amber);text-align:left;max-width:520px;margin:0 auto 2rem;}
+  .start-section{display:flex;flex-direction:column;align-items:center;gap:1rem;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;padding:14px 36px;font-size:16px;font-weight:500;font-family:'DM Sans',sans-serif;border-radius:50px;cursor:pointer;transition:background 0.18s,transform 0.12s;}
+  .btn-primary:hover{background:#1E4A8A;transform:translateY(-1px);}
+  .btn-outline{background:transparent;color:var(--text-muted);border:1px solid var(--border);padding:10px 24px;font-size:14px;font-family:'DM Sans',sans-serif;border-radius:50px;cursor:pointer;transition:border-color 0.15s,color 0.15s;}
+  .btn-outline:hover{border-color:var(--text-muted);color:var(--text);}
+  .stats-row{display:flex;justify-content:center;gap:2.5rem;padding:2rem 0 0;border-top:1px solid var(--border);margin-top:2rem;}
+  .stat{text-align:center;}
+  .stat-num{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--accent);}
+  .stat-label{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);}
+  .how-card{text-align:center;padding:1.25rem 1rem;}
+  .how-num{width:36px;height:36px;border-radius:10px;background:var(--accent-light);color:var(--accent);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+  .how-label{font-size:14px;color:var(--text-muted);line-height:1.5;}
+  .progress-bar-wrap{margin-bottom:2rem;}
+  .progress-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--text-muted);margin-bottom:8px;}
+  .progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.4s ease;}
+  .question-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem;}
+  .question-step{font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+  .question-text{font-family:'DM Serif Display',serif;font-size:1.5rem;line-height:1.3;margin-bottom:1.5rem;}
+  .options-grid{display:flex;flex-direction:column;gap:10px;}
+  .option-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s,transform 0.1s;font-weight:400;display:block;width:100%;}
+  .option-btn:hover{border-color:var(--accent);background:var(--accent-light);transform:translateX(3px);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;}
+  .back-btn{background:none;border:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:8px 0;}
+  .back-btn:hover{color:var(--text);}
+  .emergency-banner{background:#FFF1F1;border:1.5px solid #FCA5A5;border-radius:var(--radius-sm);padding:12px 16px;font-size:14px;color:var(--red);display:flex;gap:10px;align-items:center;margin-bottom:1.5rem;font-weight:500;}
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem;}
+  .result-header{padding:2rem;}
+  .result-level{font-size:12px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;}
+  .result-level.green{color:var(--green);}
+  .result-level.amber{color:var(--amber);}
+  .result-level.red{color:var(--red);}
+  .result-title{font-family:'DM Serif Display',serif;font-size:1.4rem;line-height:1.25;}
+  .result-body{padding:0 2rem 1.5rem;border-top:1px solid var(--border);}
+  .result-section{padding:1.25rem 0;border-bottom:1px solid var(--border);}
+  .result-section:last-child{border-bottom:none;}
+  .result-section-title{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
+  .action-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+  .action-list li{display:flex;align-items:flex-start;gap:10px;font-size:15px;}
+  .action-dot{width:6px;height:6px;border-radius:50%;margin-top:8px;flex-shrink:0;}
+  .action-dot.green{background:var(--green-mid);}
+  .action-dot.amber{background:#D97706;}
+  .action-dot.red{background:var(--red);}
+  .warning-signs{display:flex;flex-wrap:wrap;gap:8px;}
+  .warning-tag{font-size:13px;background:var(--red-light);color:var(--red);border:1px solid #FCA5A5;border-radius:6px;padding:4px 10px;font-weight:500;}
+  .symptoms-summary{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:14px;color:var(--text-muted);}
+  .symptoms-summary strong{color:var(--text);font-weight:500;}
+  .resources-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1rem;}
+  .resource-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;}
+  .resource-name{font-weight:500;font-size:14px;margin-bottom:3px;}
+  .resource-desc{font-size:12px;color:var(--text-muted);margin-bottom:8px;}
+  .resource-link{font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;}
+  .resource-link:hover{text-decoration:underline;}
+  footer{text-align:center;padding:2rem 1.5rem;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);background:var(--surface);}
+  footer strong{color:var(--text);}
+  .btn-share{display:flex;align-items:center;gap:8px;border:none;padding:11px 20px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;border-radius:50px;cursor:pointer;transition:opacity 0.15s,transform 0.12s;}
+  .btn-share:hover{opacity:0.88;transform:translateY(-1px);}
+  .btn-share.whatsapp{background:#25D366;color:#fff;}
+  .btn-share.print{background:var(--bg);color:var(--text);border:1px solid var(--border);}
+  .pwa-banner{background:var(--accent-light);border:1px solid #C3D7F5;border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;color:var(--accent);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:1.5rem;}
+  .pwa-install-btn{background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:50px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;}
+  .print-header{display:none;text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #ccc;}
+  .print-header h2{font-family:'DM Serif Display',serif;font-size:1.4rem;}
+  .print-header p{font-size:12px;color:#666;margin-top:4px;}
+  @media(max-width:600px){.how-grid{grid-template-columns:1fr;}.resources-grid{grid-template-columns:1fr;}.stats-row{gap:1.5rem;}}
+  @media print{
+    header,footer,.start-section,.how-grid,.stats-row,.nav-row,.btn-primary,.btn-outline,.btn-share,.pwa-banner{display:none!important;}
+    body{background:#fff;}
+    .screen{display:none!important;}
+    #screen-result{display:block!important;}
+    .result-card{border:1px solid #ccc;box-shadow:none;}
+    .print-header{display:block!important;}
+    .option-btn,.back-btn{display:none!important;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <path d="M12 2L12 8M12 8C9.8 8 8 9.8 8 12C8 14.2 9.8 16 12 16C14.2 16 16 14.2 16 12C16 9.8 14.2 8 12 8Z"/>
+        <path d="M12 16V22M8 12H2M22 12H16"/>
+      </svg>
+    </div>
+    <span class="logo-text">MedSympTra</span>
+    <span class="logo-badge">SDG 3</span>
+  </div>
+  <div class="header-right">
+    <div class="sdg-tag"><div class="sdg-dot"></div><span>Health &amp; Well-being</span></div>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div id="pwa-banner" class="pwa-banner" style="display:none">
+      <span>Install MedSympTra on your phone — works offline too!</span>
+      <button class="pwa-install-btn" onclick="installPWA()">Install App</button>
+    </div>
+    <div class="hero">
+      <div class="hero-eyebrow">Free · Private · No Login Required</div>
+      <h1>Know when to seek<br><em>medical care</em></h1>
+      <p>Answer a few questions about your symptoms. We'll guide you on whether to rest at home, visit a clinic, or go to the emergency room.</p>
+      <div class="disclaimer-box"><span>This tool provides <strong>care check guidance only</strong> — not a medical diagnosis. Always follow the advice of a qualified healthcare professional.</span></div>
+      <div class="start-section">
+        <button class="btn-primary" onclick="startChecker()">Start Symptom Check</button>
+        <button class="btn-outline" onclick="showResources()">View Health Resources</button>
+      </div>
+    </div>
+    <div class="how-grid">
+      <div class="how-card"><div class="how-num">1</div><div class="how-label">Describe your symptoms in a simple step-by-step flow</div></div>
+      <div class="how-card"><div class="how-num">2</div><div class="how-label">We analyse severity, duration, and risk factors</div></div>
+      <div class="how-card"><div class="how-num">3</div><div class="how-label">Get a clear recommendation — stay home, clinic, or ER</div></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Care check levels</div></div>
+      <div class="stat"><div class="stat-num">&lt;2 min</div><div class="stat-label">To complete</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Private — no data stored</div></div>
+    </div>
+  </div>
+
+  <!-- CHECKER -->
+  <div class="screen" id="screen-checker">
+    <div id="emergency-banner" class="emergency-banner" style="display:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="emergency-text"></span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-meta"><span id="progress-label"></span><span id="progress-pct"></span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="question-card">
+      <div class="question-step" id="q-step"></div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options-grid" id="q-options"></div>
+    </div>
+    <div class="nav-row">
+      <button class="back-btn" onclick="goBack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Back</span>
+      </button>
+      <span style="font-size:13px;color:var(--text-muted)">All answers are private</span>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div class="print-header">
+      <h2>MedSympTra — Health Guidance Report</h2>
+      <p>Generated on <span id="print-date"></span> &nbsp;·&nbsp; MedSympTra.health &nbsp;·&nbsp; UN SDG 3: Good Health &amp; Well-being</p>
+      <p style="margin-top:4px;color:#c00;font-weight:500;">This is guidance only — not a medical diagnosis. Always consult a qualified healthcare professional.</p>
+    </div>
+    <div id="result-content"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:0.5rem;">
+      <button class="btn-primary" onclick="startChecker()">Check Again</button>
+      <button class="btn-share whatsapp" onclick="shareWhatsApp()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share on WhatsApp
+      </button>
+      <button class="btn-share print" onclick="printResult()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save PDF
+      </button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+      <button class="btn-outline" onclick="showResources()">Health Resources</button>
+      <button class="btn-outline" onclick="goHome()">Home</button>
+    </div>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="screen" id="screen-resources">
+    <div style="margin-bottom:2rem;">
+      <button class="back-btn" onclick="goHome()" style="margin-bottom:1rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Back</span>
+      </button>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:0.5rem;">Health Resources</h2>
+      <p style="color:var(--text-muted);font-size:15px;">Trusted helplines, government programmes, and global health organisations.</p>
+    </div>
+    <div style="margin-bottom:2rem;">
+      <div class="result-section-title" style="margin-bottom:12px;">Emergency &amp; Helpline Numbers — India</div>
+      <div class="resources-grid">
+        <div class="resource-card"><div class="resource-name">Ambulance</div><div class="resource-desc">National emergency ambulance — 24/7</div><div class="resource-link">102 | 108</div></div>
+        <div class="resource-card"><div class="resource-name">National Health Helpline</div><div class="resource-desc">Free medical advice, 24/7</div><div class="resource-link">104</div></div>
+        <div class="resource-card"><div class="resource-name">Mental Health — iCall</div><div class="resource-desc">Free psychological support (TISS)</div><div class="resource-link">9152987821</div></div>
+        <div class="resource-card"><div class="resource-name">Vandrevala Foundation</div><div class="resource-desc">24/7 mental health helpline</div><div class="resource-link">1860-2662-345</div></div>
+        <div class="resource-card"><div class="resource-name">Women's Helpline</div><div class="resource-desc">National helpline for women in distress</div><div class="resource-link">181</div></div>
+        <div class="resource-card"><div class="resource-name">Child Helpline</div><div class="resource-desc">Emergency outreach for children</div><div class="resource-link">1098</div></div>
+        <div class="resource-card"><div class="resource-name">Senior Citizen Helpline</div><div class="resource-desc">Support for elderly citizens</div><div class="resource-link">14567</div></div>
+        <div class="resource-card"><div class="resource-name">Poison Control — AIIMS</div><div class="resource-desc">Help for poisoning and overdose</div><div class="resource-link">011-26593677</div></div>
+        <div class="resource-card"><div class="resource-name">COVID-19 Helpline</div><div class="resource-desc">Active for respiratory queries</div><div class="resource-link">1075</div></div>
+        <div class="resource-card"><div class="resource-name">TB Helpline — Nikshay</div><div class="resource-desc">Free TB diagnosis and treatment</div><div class="resource-link">1800-11-6666</div></div>
+        <div class="resource-card"><div class="resource-name">Blood Bank — eRaktKosh</div><div class="resource-desc">Find nearby blood banks</div><a class="resource-link" href="https://eraktkosh.in" target="_blank">eraktkosh.in</a></div>
+        <div class="resource-card"><div class="resource-name">Organ Donation — NOTTO</div><div class="resource-desc">National organ donation helpline</div><div class="resource-link">1800-11-4770</div></div>
+      </div>
+    </div>
+    <div style="background:var(--accent-light);border:1px solid #C3D7F5;border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Ayushman Bharat Health Account</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:10px;">What is ABHA?</div>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:10px;">ABHA is a 14-digit unique health identity issued by the Government of India. It lets every citizen securely store, access, and share their medical records — prescriptions, lab reports, and doctor visits — digitally, from anywhere.</p>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">With ABHA, doctors can instantly access your health history, reducing repeated tests and improving care — especially important in rural settings where paper records are easily lost.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <a href="https://abha.abdm.gov.in" target="_blank" style="font-size:13px;background:var(--accent);color:#fff;padding:8px 16px;border-radius:50px;text-decoration:none;font-weight:500;">Create your ABHA ID</a>
+        <a class="resource-link" href="https://abdm.gov.in" target="_blank">Learn about ABDM</a>
+      </div>
+    </div>
+    <div style="margin-bottom:2rem;">
+      <div class="result-section-title" style="margin-bottom:12px;">Government Health Programmes — India</div>
+      <div class="resources-grid">
+        <div class="resource-card"><div class="resource-name">Ayushman Bharat PM-JAY</div><div class="resource-desc">Health insurance up to Rs. 5 lakh per family per year</div><a class="resource-link" href="https://pmjay.gov.in" target="_blank">pmjay.gov.in</a></div>
+        <div class="resource-card"><div class="resource-name">eSanjeevani Telemedicine</div><div class="resource-desc">Free online doctor consultation from home</div><a class="resource-link" href="https://esanjeevani.mohfw.gov.in" target="_blank">esanjeevani.mohfw.gov.in</a></div>
+        <div class="resource-card"><div class="resource-name">Jan Aushadhi</div><div class="resource-desc">Generic medicines at up to 90% lower cost</div><a class="resource-link" href="https://janaushadhi.gov.in" target="_blank">janaushadhi.gov.in</a></div>
+        <div class="resource-card"><div class="resource-name">MoHFW India</div><div class="resource-desc">Ministry of Health &amp; Family Welfare</div><a class="resource-link" href="https://mohfw.gov.in" target="_blank">mohfw.gov.in</a></div>
+        <div class="resource-card"><div class="resource-name">PM Surakshit Matritva</div><div class="resource-desc">Free antenatal check-ups for pregnant women every 9th</div><a class="resource-link" href="https://pmsma.nhp.gov.in" target="_blank">pmsma.nhp.gov.in</a></div>
+        <div class="resource-card"><div class="resource-name">National Health Portal</div><div class="resource-desc">Health information in multiple Indian languages</div><a class="resource-link" href="https://nhp.gov.in" target="_blank">nhp.gov.in</a></div>
+      </div>
+    </div>
+    <div style="background:var(--green-light);border:1px solid #A8D9C2;border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:8px;">World Health Organization</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:10px;">About WHO</div>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">The World Health Organization (WHO) is the United Nations agency responsible for international public health. It sets global health standards, coordinates responses to health emergencies, and provides evidence-based guidance. WHO is a key partner in achieving SDG 3 — ensuring healthy lives and well-being for all people of all ages.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;">
+        <a class="resource-link" href="https://www.who.int/health-topics" target="_blank" style="color:var(--green);">All health topics</a>
+        <a class="resource-link" href="https://www.who.int/emergencies" target="_blank" style="color:var(--green);">Health emergencies</a>
+        <a class="resource-link" href="https://www.who.int/india" target="_blank" style="color:var(--green);">WHO India office</a>
+      </div>
+    </div>
+    <div style="margin-bottom:2rem;">
+      <div class="result-section-title" style="margin-bottom:12px;">Other Trusted Global Health Sources</div>
+      <div class="resources-grid">
+        <div class="resource-card"><div class="resource-name">UNICEF</div><div class="resource-desc">Child nutrition, immunisation, and maternal care</div><a class="resource-link" href="https://unicef.org/health" target="_blank">unicef.org/health</a></div>
+        <div class="resource-card"><div class="resource-name">ICMR</div><div class="resource-desc">Indian Council of Medical Research</div><a class="resource-link" href="https://icmr.gov.in" target="_blank">icmr.gov.in</a></div>
+        <div class="resource-card"><div class="resource-name">CDC</div><div class="resource-desc">US Centers for Disease Control — global disease data</div><a class="resource-link" href="https://cdc.gov" target="_blank">cdc.gov</a></div>
+        <div class="resource-card"><div class="resource-name">UNDP — SDG 3</div><div class="resource-desc">Progress tracking on SDG 3 globally</div><a class="resource-link" href="https://sdgs.un.org/goals/goal3" target="_blank">sdgs.un.org</a></div>
+      </div>
+    </div>
+    <button class="btn-outline" onclick="goHome()">Back to Home</button>
+  </div>
+</main>
+
+<footer>Built for the <strong>GNEC Hackathon</strong> · Aligned with <strong>UN SDG 3: Good Health &amp; Well-being</strong> · Not a substitute for professional medical advice.</footer>
+
+<script>
+const i18n = {
+  en: {
+    emergency_msg:"If you are experiencing a life-threatening emergency, call 102 / 108 immediately.",
+    q_of:"Question {n} of {total}",
+    result_what_to_do:"What to do now",
+    result_warn_title:"Seek emergency care immediately if you notice",
+    result_your_responses:"Your responses",
+    result_labels:["Primary symptom","Duration","Severity","Age group","Pre-existing conditions","Symptom trend","Distance to care"],
+    res_emergency:{levelLabel:"Emergency — Act Now",title:"Go to the Emergency Room immediately",message:"Based on your symptoms, you need urgent medical attention. Please go to the nearest emergency room or call an ambulance right away. Do not wait.",actions:["Call 102 or 108 for an ambulance immediately","Go to the nearest hospital emergency department","Do not drive yourself — ask someone to take you","If symptoms worsen rapidly, call emergency services first"],warnSigns:["Loss of consciousness","Severe chest pain","Cannot breathe","Uncontrolled bleeding"]},
+    res_clinic:{levelLabel:"Medical Attention Needed",title:"Visit a clinic or doctor soon",message:"Your symptoms suggest you should see a healthcare provider. While this is not an immediate emergency, seek professional care within the next 12–24 hours.",actions:["Book an appointment at your nearest clinic or PHC today","No clinic? Use eSanjeevani (free telemedicine) at esanjeevani.mohfw.gov.in","Call the National Health Helpline (104) for guidance","Monitor closely — go to ER if symptoms rapidly worsen"],warnSigns:["Chest pain or pressure","Difficulty breathing","High fever (above 39.4°C)","Confusion or disorientation"]},
+    res_home:{levelLabel:"Home Care Appropriate",title:"Rest at home and monitor your symptoms",message:"Based on your answers, your symptoms appear mild and manageable at home. Focus on rest, hydration, and basic self-care.",actions:["Stay hydrated — drink water, ORS, or clear fluids regularly","Rest and avoid strenuous activity until better","Take paracetamol for fever or pain if needed","Eat light meals and get adequate sleep"],warnSigns:["Fever above 103°F that does not break","Symptoms suddenly worsen","Chest pain or breathing difficulty develops","Unable to keep fluids down"]},
+    questions:[
+      {step:"Step 1",text:"What is your primary symptom right now?",options:["Fever or chills","Chest pain or tightness","Difficulty breathing","Headache or dizziness","Stomach pain or nausea","Cuts, wounds, or injury","Other / General weakness"]},
+      {step:"Step 2",text:"How long have you been experiencing this?",options:["Just started (less than a few hours)","1–3 days","4–7 days","More than a week"]},
+      {step:"Step 3",text:"How severe is the discomfort on a scale of 1–10?",options:["Mild (1–3) — manageable, not interfering with daily tasks","Moderate (4–6) — noticeable, slowing me down","Severe (7–9) — very painful or worrying","Extreme (10) — worst I have felt, unbearable"]},
+      {step:"Step 4",text:"What is the age of the person affected?",options:["Infant or toddler (under 5)","Child (5–17)","Adult (18–59)","Senior (60 or older)"]},
+      {step:"Step 5",text:"Does the person have any pre-existing conditions?",options:["No known conditions","Diabetes or hypertension","Heart or lung disease","Pregnant","Unsure"]},
+      {step:"Step 6",text:"Are symptoms getting better or worse over time?",options:["Getting better on their own","Staying about the same","Gradually getting worse","Getting much worse very quickly"]},
+      {step:"Step 7",text:"How far are you from the nearest healthcare facility?",options:["Less than 30 minutes away","30 min – 2 hours away","More than 2 hours away"]}
+    ]
+  }
+};
+
+const questionMeta = [
+  {options:[null,{urgent:true},{urgent:true},null,null,null,null]},
+  {options:[null,null,null,null]},
+  {options:[null,null,null,{urgent:true}]},
+  {options:[{riskFactor:true},null,null,{riskFactor:true}]},
+  {options:[null,{riskFactor:true},{riskFactor:true},{riskFactor:true},null]},
+  {options:[null,null,null,{urgent:true}]},
+  {options:[null,null,null]}
+];
+
+let currentLang='en', answers=[], currentQ=0, urgentFlags=0, riskFactors=0;
+
+function t(key){ return i18n[currentLang][key] || i18n.en[key] || key; }
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome(){showScreen('home');}
+function showResources(){showScreen('resources');}
+
+function startChecker(){
+  answers=[];currentQ=0;urgentFlags=0;riskFactors=0;
+  document.getElementById('emergency-banner').style.display='none';
+  showScreen('checker');
+  renderQuestion();
+}
+
+function goBack(){
+  if(currentQ===0){goHome();return;}
+  const prev=answers.pop();
+  if(prev&&prev.urgent) urgentFlags--;
+  if(prev&&prev.riskFactor) riskFactors--;
+  currentQ--;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const lang=i18n[currentLang];
+  const q=lang.questions[currentQ];
+  const total=lang.questions.length;
+  const pct=Math.round((currentQ/total)*100);
+  document.getElementById('progress-label').textContent=t('q_of').replace('{n}',currentQ+1).replace('{total}',total);
+  document.getElementById('progress-pct').textContent=pct+'%';
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('q-step').textContent=q.step;
+  document.getElementById('q-text').textContent=q.text;
+  document.getElementById('emergency-text').textContent=t('emergency_msg');
+  const opts=document.getElementById('q-options');
+  opts.innerHTML='';
+  q.options.forEach((label,i)=>{
+    const meta=questionMeta[currentQ].options[i]||{};
+    const btn=document.createElement('button');
+    btn.className='option-btn';
+    btn.textContent=label;
+    btn.onclick=()=>selectOption({label,value:i,...meta});
+    opts.appendChild(btn);
+  });
+  if(currentQ===0) document.getElementById('emergency-banner').style.display='none';
+}
+
+function selectOption(opt){
+  answers.push(opt);
+  if(opt.urgent) urgentFlags++;
+  if(opt.riskFactor) riskFactors++;
+  if(opt.urgent&&currentQ<=2) document.getElementById('emergency-banner').style.display='flex';
+  currentQ++;
+  if(currentQ>=i18n[currentLang].questions.length) computeResult();
+  else renderQuestion();
+}
+
+function computeResult(){
+  const pv=answers[0]?.value, sv=answers[2]?.value, spv=answers[5]?.value;
+  const isEmergency=urgentFlags>=2||pv===1||pv===2||sv===3||(spv===3&&urgentFlags>=1);
+  const isClinic=urgentFlags>=1||riskFactors>=1||sv===2||answers[1]?.value>=2||spv===2;
+  const level=isEmergency?'red':isClinic?'amber':'green';
+  const lang=i18n[currentLang];
+  const data=level==='red'?lang.res_emergency:level==='amber'?lang.res_clinic:lang.res_home;
+  const summary=answers.map((a,i)=>`<strong>${lang.result_labels[i]}:</strong> ${a.label}`).join(' &nbsp;·&nbsp; ');
+  const actions=data.actions.map(a=>`<li><div class="action-dot ${level}"></div><span>${a}</span></li>`).join('');
+  const warns=data.warnSigns.map(w=>`<span class="warning-tag">${w}</span>`).join('');
+  document.getElementById('result-content').innerHTML=`
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-level ${level}">${data.levelLabel}</div>
+        <div class="result-title">${data.title}</div>
+      </div>
+      <div class="result-body">
+        <div class="result-section"><p style="font-size:15px;color:var(--text-muted);line-height:1.7;">${data.message}</p></div>
+        <div class="result-section"><div class="result-section-title">${lang.result_what_to_do}</div><ul class="action-list">${actions}</ul></div>
+        <div class="result-section"><div class="result-section-title">${lang.result_warn_title}</div><div class="warning-signs">${warns}</div></div>
+      </div>
+    </div>
+    <div class="symptoms-summary">
+      <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">${lang.result_your_responses}</div>
+      ${summary}
+    </div>`;
+  showScreen('result');
+}
+
+// ── SHARE: WhatsApp ──────────────────────────────────────────
+function shareWhatsApp() {
+  const lang = i18n[currentLang];
+  const pv = answers[0]?.value, sv = answers[2]?.value, spv = answers[5]?.value;
+  const isEmergency = urgentFlags>=2||pv===1||pv===2||sv===3||(spv===3&&urgentFlags>=1);
+  const isClinic = urgentFlags>=1||riskFactors>=1||sv===2||answers[1]?.value>=2||spv===2;
+  const level = isEmergency?'red':isClinic?'amber':'green';
+  const data = level==='red'?lang.res_emergency:level==='amber'?lang.res_clinic:lang.res_home;
+  const emoji = level==='red'?'🚨':level==='amber'?'🏥':'🏠';
+  const lines = [
+    `${emoji} *MedSympTra Result*`,
+    `*${data.levelLabel}*`,
+    `${data.title}`,
+    ``,
+    `*What to do:*`,
+    ...data.actions.map(a => `• ${a}`),
+    ``,
+    `⚠️ *Watch for:* ${data.warnSigns.join(', ')}`,
+    ``,
+    `_This is guidance only — not a medical diagnosis. Always consult a healthcare professional._`,
+    `_Generated by MedSympTra · SDG 3: Good Health & Well-being_`
+  ];
+  const text = encodeURIComponent(lines.join('\n'));
+  window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+// ── SHARE: Print / Save PDF ──────────────────────────────────
+function printResult() {
+  document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
+  window.print();
+}
+
+// ── PWA: Install prompt ───────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('pwa-banner').style.display = 'flex';
+});
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('pwa-banner').style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-banner').style.display = 'none';
+});
+
+// ── SERVICE WORKER ────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
